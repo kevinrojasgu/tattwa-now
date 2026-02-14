@@ -1,9 +1,37 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { TATTWAS, TATTWA_ORDER, type TattwaName } from '../lib/tattwaData';
 import { TattwaShape } from './TattwaShapes';
 
 interface TattwaReferenceProps {
   currentTattwa?: TattwaName;
+}
+
+/**
+ * Smooth height animation using refs
+ */
+function AnimatedExpand({ isExpanded, children }: { isExpanded: boolean; children: React.ReactNode }) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      setHeight(isExpanded ? contentRef.current.scrollHeight : 0);
+    }
+  }, [isExpanded]);
+
+  return (
+    <div
+      className="overflow-hidden transition-all duration-350 ease-[cubic-bezier(0.4,0,0.2,1)]"
+      style={{
+        maxHeight: `${height}px`,
+        opacity: isExpanded ? 1 : 0,
+      }}
+    >
+      <div ref={contentRef}>
+        {children}
+      </div>
+    </div>
+  );
 }
 
 export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
@@ -14,13 +42,13 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
   };
 
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-sm p-4 sm:p-6">
+    <div className="rounded-2xl bg-white/5 backdrop-blur-sm p-4 sm:p-6 glass-card">
       <h3 className="text-sm uppercase tracking-wider text-white/50 mb-4">
         Tattwa Reference
       </h3>
 
       <div className="space-y-2">
-        {TATTWA_ORDER.map((name) => {
+        {TATTWA_ORDER.map((name, index) => {
           const info = TATTWAS[name];
           const isExpanded = expandedTattwa === name;
           const isCurrent = currentTattwa === name;
@@ -36,20 +64,24 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
                     ? `${info.colorHex}10`
                     : 'rgba(255,255,255,0.03)',
                 border: isCurrent ? `1px solid ${info.colorHex}40` : '1px solid transparent',
+                animation: `fadeInUp 0.3s ease-out ${index * 0.05}s both`,
               }}
             >
               {/* Header - always visible */}
               <button
                 onClick={() => toggle(name)}
-                className="w-full flex items-center gap-3 p-3 sm:p-4 text-left hover:bg-white/5 transition-colors"
+                className="w-full flex items-center gap-3 p-3 sm:p-4 text-left hover:bg-white/5 transition-all duration-200 group"
               >
-                <div style={{ color: info.colorLight }}>
+                <div
+                  className="transition-transform duration-300 group-hover:scale-110"
+                  style={{ color: info.colorLight }}
+                >
                   <TattwaShape tattwa={name} size={32} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span
-                      className="font-semibold"
+                      className="font-semibold transition-colors duration-300"
                       style={{ color: info.colorLight }}
                     >
                       {name}
@@ -63,6 +95,7 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
                         style={{
                           backgroundColor: `${info.colorHex}30`,
                           color: info.colorLight,
+                          animation: 'pulseGlow 2s ease-in-out infinite',
                         }}
                       >
                         ACTIVE
@@ -88,19 +121,32 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
                 </svg>
               </button>
 
-              {/* Expanded content */}
-              {isExpanded && (
+              {/* Animated expanded content */}
+              <AnimatedExpand isExpanded={isExpanded}>
                 <div className="px-3 sm:px-4 pb-4 space-y-3">
                   {/* Properties grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-                    <PropItem label="Color" value={info.color} />
-                    <PropItem label="Shape" value={info.shape} />
-                    <PropItem label="Planet" value={info.planet} />
-                    <PropItem label="Direction" value={info.direction} />
-                    <PropItem label="Sense" value={info.sense} />
-                    <PropItem label="Taste" value={info.taste} />
-                    <PropItem label="Mantra" value={info.mantra} />
-                    <PropItem label="Symbol" value={info.symbol} />
+                    {[
+                      { label: 'Color', value: info.color },
+                      { label: 'Shape', value: info.shape },
+                      { label: 'Planet', value: info.planet },
+                      { label: 'Direction', value: info.direction },
+                      { label: 'Sense', value: info.sense },
+                      { label: 'Taste', value: info.taste },
+                      { label: 'Mantra', value: info.mantra },
+                      { label: 'Symbol', value: info.symbol },
+                    ].map((prop, i) => (
+                      <div
+                        key={prop.label}
+                        className="bg-white/5 rounded-lg px-2.5 py-1.5 transition-all duration-200 hover:bg-white/10"
+                        style={{
+                          animation: isExpanded ? `fadeInUp 0.2s ease-out ${i * 0.03}s both` : undefined,
+                        }}
+                      >
+                        <div className="text-white/35 text-xs">{prop.label}</div>
+                        <div className="text-white/80 text-xs font-medium">{prop.value}</div>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Description */}
@@ -116,7 +162,7 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
                       </div>
                       <ul className="text-xs text-white/50 space-y-1">
                         {info.favorableFor.map((item, i) => (
-                          <li key={i} className="flex gap-1.5">
+                          <li key={i} className="flex gap-1.5 transition-colors duration-200 hover:text-white/70">
                             <span className="text-green-400/50">+</span>
                             {item}
                           </li>
@@ -129,7 +175,7 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
                       </div>
                       <ul className="text-xs text-white/50 space-y-1">
                         {info.unfavorableFor.map((item, i) => (
-                          <li key={i} className="flex gap-1.5">
+                          <li key={i} className="flex gap-1.5 transition-colors duration-200 hover:text-white/70">
                             <span className="text-red-400/50">-</span>
                             {item}
                           </li>
@@ -138,20 +184,11 @@ export function TattwaReference({ currentTattwa }: TattwaReferenceProps) {
                     </div>
                   </div>
                 </div>
-              )}
+              </AnimatedExpand>
             </div>
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function PropItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bg-white/5 rounded-lg px-2.5 py-1.5">
-      <div className="text-white/35 text-xs">{label}</div>
-      <div className="text-white/80 text-xs font-medium">{value}</div>
     </div>
   );
 }

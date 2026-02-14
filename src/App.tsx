@@ -5,6 +5,7 @@ import { Timeline } from './components/Timeline';
 import { MoonPhaseComponent } from './components/MoonPhase';
 import { LocationPicker } from './components/LocationPicker';
 import { TattwaReference } from './components/TattwaReference';
+import { MiniMap } from './components/MiniMap';
 
 function App() {
   const { location, autoDetect, setManualLocation } = useLocation();
@@ -13,8 +14,11 @@ function App() {
   if (!state) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white/50 text-lg animate-pulse">
-          Calculating vibrations...
+        <div className="text-white/50 text-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-white/40 animate-breathe" />
+            <span className="animate-fade-in-up">Calculating vibrations...</span>
+          </div>
         </div>
       </div>
     );
@@ -24,7 +28,7 @@ function App() {
     <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
-        <header className="flex items-center justify-between">
+        <header className="flex items-center justify-between animate-fade-in-up">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white/90 tracking-tight">
               Tatva Now
@@ -41,23 +45,38 @@ function App() {
         </header>
 
         {/* Main Tattwa Card */}
-        <TattwaCard state={state.tattwa} />
+        <div className="animate-fade-in-up stagger-1">
+          <TattwaCard state={state.tattwa} />
+        </div>
 
-        {/* Timeline */}
-        <Timeline
-          now={new Date()}
+        {/* Mini Map */}
+        <MiniMap
           lat={location.lat}
           lng={location.lng}
+          locationName={location.name}
         />
 
+        {/* Timeline */}
+        <div className="animate-fade-in-up stagger-4">
+          <Timeline
+            now={new Date()}
+            lat={location.lat}
+            lng={location.lng}
+          />
+        </div>
+
         {/* Moon Phase & Breathing */}
-        <MoonPhaseComponent moon={state.moon} sun={state.sun} />
+        <div className="animate-fade-in-up stagger-5">
+          <MoonPhaseComponent moon={state.moon} sun={state.sun} />
+        </div>
 
         {/* Reference */}
-        <TattwaReference currentTattwa={state.tattwa.tattwa} />
+        <div className="animate-fade-in-up stagger-6">
+          <TattwaReference currentTattwa={state.tattwa.tattwa} />
+        </div>
 
         {/* Footer */}
-        <footer className="text-center text-xs text-white/20 pb-4">
+        <footer className="text-center text-xs text-white/20 pb-4 animate-fade-in-up stagger-7">
           Based on "El Tatwametro" by Dr. Arnold Krumm-Heller (Maestro Huiracocha)
         </footer>
       </div>

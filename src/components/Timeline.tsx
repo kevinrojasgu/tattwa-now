@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { getDayTimeline } from '../lib/tattwas';
 import { TATTWAS } from '../lib/tattwaData';
 import { formatTime } from '../lib/sunrise';
@@ -11,6 +11,7 @@ interface TimelineProps {
 
 export function Timeline({ now, lat, lng }: TimelineProps) {
   const entries = useMemo(() => getDayTimeline(now, lat, lng), [now, lat, lng]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   // Show 12 hours of entries (30 tattwa periods = 6 full cycles)
   const visibleEntries = entries.slice(0, 30);
@@ -18,21 +19,29 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
   // Find the index of the current period
   const currentIndex = visibleEntries.findIndex((e) => e.isCurrent);
 
-  // We'll show a window around the current period
-  // On mobile, show fewer; on desktop show more
   const windowSize = 15;
   const halfWindow = Math.floor(windowSize / 2);
   const startIdx = Math.max(0, currentIndex - halfWindow);
   const displayEntries = visibleEntries.slice(startIdx, startIdx + windowSize);
 
+  // Auto-scroll to center current period
+  useEffect(() => {
+    if (scrollRef.current) {
+      const currentEl = scrollRef.current.querySelector('[data-current="true"]');
+      if (currentEl) {
+        currentEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+  }, [currentIndex]);
+
   return (
-    <div className="rounded-2xl bg-white/5 backdrop-blur-sm p-4 sm:p-6">
+    <div className="rounded-2xl bg-white/5 backdrop-blur-sm p-4 sm:p-6 glass-card">
       <h3 className="text-sm uppercase tracking-wider text-white/50 mb-4">
         Daily Timeline
       </h3>
 
       {/* Horizontal scrolling timeline */}
-      <div className="overflow-x-auto pb-2 -mx-2 px-2">
+      <div className="overflow-x-auto pb-2 -mx-2 px-2" ref={scrollRef}>
         <div className="flex gap-0.5 min-w-max">
           {displayEntries.map((entry, i) => {
             const info = TATTWAS[entry.tattwa];
@@ -42,16 +51,20 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
             return (
               <div
                 key={startIdx + i}
-                className="flex flex-col items-center group relative"
-                style={{ minWidth: isCurrent ? '60px' : '40px' }}
+                data-current={isCurrent ? 'true' : undefined}
+                className="flex flex-col items-center group relative cursor-default"
+                style={{
+                  minWidth: isCurrent ? '60px' : '40px',
+                  animation: `fadeInUp 0.3s ease-out ${i * 0.03}s both`,
+                }}
               >
-                {/* Time label - only for first of each cycle or current */}
+                {/* Time label */}
                 {((startIdx + i) % 5 === 0 || isCurrent) && (
                   <div
-                    className="text-white/50 mb-1 whitespace-nowrap"
+                    className="mb-1 whitespace-nowrap transition-colors duration-300"
                     style={{
                       fontSize: '0.6rem',
-                      color: isCurrent ? info.colorLight : undefined,
+                      color: isCurrent ? info.colorLight : 'rgba(255,255,255,0.5)',
                       fontWeight: isCurrent ? 600 : 400,
                     }}
                   >
@@ -64,9 +77,9 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
                   </div>
                 )}
 
-                {/* Bar */}
+                {/* Bar with hover effect */}
                 <div
-                  className="rounded-sm transition-all duration-300 relative"
+                  className="rounded-sm relative transition-all duration-300 group-hover:brightness-125"
                   style={{
                     height: isCurrent ? '32px' : '20px',
                     width: '100%',
@@ -78,22 +91,32 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
                     boxShadow: isCurrent
                       ? `0 0 12px ${info.colorHex}60`
                       : 'none',
+                    transform: isCurrent ? 'scaleY(1)' : 'scaleY(1)',
                   }}
                 >
                   {/* Current indicator pulse */}
                   {isCurrent && (
                     <div
-                      className="absolute inset-0 rounded-sm animate-pulse"
+                      className="absolute inset-0 rounded-sm"
                       style={{
                         backgroundColor: `${info.colorLight}20`,
+                        animation: 'pulseGlow 2s ease-in-out infinite',
                       }}
                     />
                   )}
+
+                  {/* Hover tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                    <div className="bg-[#1a1a2e] border border-white/10 rounded-lg px-2 py-1 whitespace-nowrap text-xs shadow-xl">
+                      <span style={{ color: info.colorLight }}>{entry.tattwa}</span>
+                      <span className="text-white/40 ml-1">{formatTime(entry.start)}</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Tattwa initial */}
                 <div
-                  className="mt-1 font-medium"
+                  className="mt-1 font-medium transition-colors duration-300"
                   style={{
                     fontSize: '0.55rem',
                     color: isCurrent ? info.colorLight : isPast ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.5)',
@@ -107,14 +130,17 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
         </div>
       </div>
 
-      {/* Legend */}
+      {/* Legend with hover effects */}
       <div className="flex flex-wrap gap-3 mt-4 justify-center">
         {(['Akash', 'Vayu', 'Tejas', 'Prithvi', 'Apas'] as const).map((name) => {
           const info = TATTWAS[name];
           return (
-            <div key={name} className="flex items-center gap-1.5 text-xs text-white/60">
+            <div
+              key={name}
+              className="flex items-center gap-1.5 text-xs text-white/60 transition-all duration-200 hover:text-white/90 cursor-default"
+            >
               <div
-                className="w-2.5 h-2.5 rounded-sm"
+                className="w-2.5 h-2.5 rounded-sm transition-transform duration-200 hover:scale-125"
                 style={{ backgroundColor: info.colorHex }}
               />
               {name}

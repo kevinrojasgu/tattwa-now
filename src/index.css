@@ -21,10 +21,403 @@ body {
   margin: 0;
   min-height: 100vh;
   background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+  background-attachment: fixed;
   color: #e0e0e0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
+}
+
+/* ===== Micro-interaction Keyframes ===== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes mapPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes countdownPulse {
+  0%, 100% {
+    text-shadow: 0 0 0px transparent;
+  }
+  50% {
+    text-shadow: 0 0 12px currentColor;
+  }
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+/* ===== Animation Utility Classes ===== */
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.4s ease-out both;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.25s ease-out both;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.animate-countdown-pulse {
+  animation: countdownPulse 2s ease-in-out infinite;
+}
+
+/* Staggered entrance delays */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+
+/* Shimmer on progress bar */
+.shimmer-bar {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 2s ease-in-out infinite;
+}
+
+/* Glass card hover interaction */
+.glass-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Leaflet Map Overrides (dark theme) ===== */
+
+.leaflet-container {
+  background: #0a0a1a !important;
+  border-radius: 12px;
+}
+
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+.leaflet-control-zoom {
+  display: none !important;
+}
+
+/* Map pulse marker */
+.map-marker-pulse {
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  animation: mapPulse 2s ease-out infinite;
+}
+
+/* ===== Smooth expand/collapse ===== */
+.expand-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+.expand-content.expanded {
+  grid-template-rows: 1fr;
+}
+.expand-content > div {
+  overflow: hidden;
+}
+
+/* ===== Element Animation Container ===== */
+.element-animation-container {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  animation: fadeInScale 0.8s ease-out 0.2s both;
+}
+
+/* ===== Planet Symbol Float ===== */
+.planet-symbol-float {
+  animation: planetSymbolFloat 4s ease-in-out infinite;
+}
+@keyframes planetSymbolFloat {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-3px); opacity: 0.6; }
+}
+
+/* ===== Akash — Dissolving Rings ===== */
+.akash-ring {
+  animation: akashRingExpand 6s ease-out infinite;
+  transform-origin: center;
+}
+@keyframes akashRingExpand {
+  0% { r: 12; opacity: 0.5; stroke-width: 1.2; }
+  100% { r: 50; opacity: 0; stroke-width: 0.2; }
+}
+
+.akash-particle {
+  animation: akashParticleDrift 5s ease-in-out infinite;
+}
+@keyframes akashParticleDrift {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.3; }
+  100% { opacity: 0; transform: translate(var(--drift-x, 10px), var(--drift-y, -15px)) scale(0); }
+}
+
+/* Different drift directions for each particle */
+.akash-particle:nth-child(odd) { --drift-x: -12px; --drift-y: -18px; }
+.akash-particle:nth-child(even) { --drift-x: 14px; --drift-y: -10px; }
+.akash-particle:nth-child(3n) { --drift-x: -8px; --drift-y: 12px; }
+.akash-particle:nth-child(4n) { --drift-x: 16px; --drift-y: -20px; }
+
+.saturn-ring-rotate {
+  animation: saturnRingTilt 8s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes saturnRingTilt {
+  0%, 100% { ry: 5; opacity: 0.5; }
+  50% { ry: 7; opacity: 0.35; }
+}
+
+/* ===== Vayu — Wind Lines ===== */
+.vayu-wind-line {
+  animation: vayuWindFlow 3s ease-in-out infinite;
+  stroke-dasharray: 8 4;
+}
+@keyframes vayuWindFlow {
+  0% { stroke-dashoffset: 0; opacity: 0.15; }
+  50% { stroke-dashoffset: -24; opacity: 0.4; }
+  100% { stroke-dashoffset: -48; opacity: 0.15; }
+}
+
+.vayu-swirl-particle {
+  animation: vayuSwirlOrbit 4.8s linear infinite;
+  transform-origin: 100px 60px;
+}
+@keyframes vayuSwirlOrbit {
+  0% {
+    transform: rotate(0deg) translateX(18px) scale(0.6);
+    opacity: 0;
+  }
+  15% { opacity: 0.6; }
+  85% { opacity: 0.4; }
+  100% {
+    transform: rotate(360deg) translateX(18px) scale(1);
+    opacity: 0;
+  }
+}
+
+.vayu-whorl {
+  animation: vayuWhorlSpin 6s linear infinite;
+  transform-origin: 100px 60px;
+}
+@keyframes vayuWhorlSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Tejas — Fire ===== */
+.tejas-flame {
+  animation: tejasFlameFlicker 1.5s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes tejasFlameFlicker {
+  0%, 100% { opacity: 0.18; transform: scaleY(1) scaleX(1); }
+  25% { opacity: 0.3; transform: scaleY(1.08) scaleX(0.95); }
+  50% { opacity: 0.22; transform: scaleY(0.95) scaleX(1.05); }
+  75% { opacity: 0.35; transform: scaleY(1.12) scaleX(0.92); }
+}
+
+.tejas-ember {
+  animation: tejasEmberRise 3s ease-out infinite;
+}
+@keyframes tejasEmberRise {
+  0% { cy: 80; opacity: 0.8; r: 1.5; }
+  50% { opacity: 0.5; }
+  100% { cy: 15; opacity: 0; r: 0.5; }
+}
+
+.tejas-core-pulse {
+  animation: tejasCoreGlow 2s ease-in-out infinite;
+}
+@keyframes tejasCoreGlow {
+  0%, 100% { opacity: 0.25; r: 8; }
+  50% { opacity: 0.4; r: 10; }
+}
+
+.tejas-ray {
+  animation: tejasRayPulse 2s ease-in-out infinite;
+}
+@keyframes tejasRayPulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== Prithvi — Earth / Crystal ===== */
+.prithvi-crystal {
+  animation: prithviCrystalGrow 4s ease-out both;
+  transform-origin: center bottom;
+}
+@keyframes prithviCrystalGrow {
+  0% { transform: scaleY(0); opacity: 0; }
+  60% { transform: scaleY(1.05); opacity: 0.9; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+.prithvi-gem-float {
+  animation: prithviGemFloat 5s ease-in-out infinite;
+}
+@keyframes prithviGemFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+  50% { transform: translateY(-5px) rotate(15deg); opacity: 0.3; }
+}
+
+/* ===== Apas — Water ===== */
+.apas-ripple {
+  animation: apasRippleExpand 4.8s ease-out infinite;
+}
+@keyframes apasRippleExpand {
+  0% { rx: 4; ry: 1.5; opacity: 0.5; stroke-width: 1; }
+  100% { rx: 55; ry: 18; opacity: 0; stroke-width: 0.2; }
+}
+
+.apas-wave {
+  animation: apasWaveFlow 4s ease-in-out infinite;
+  stroke-dasharray: 12 6;
+}
+@keyframes apasWaveFlow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -36; }
+}
+
+.apas-drop {
+  animation: apasDropFall 3s ease-in infinite;
+}
+@keyframes apasDropFall {
+  0% { transform: translateY(0); opacity: 0.4; }
+  70% { opacity: 0.3; }
+  90% { opacity: 0.1; }
+  100% { transform: translateY(50px); opacity: 0; }
 }
