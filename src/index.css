@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+  --color-akash: #4a4a5a;
+  --color-akash-light: #6b6b7b;
+  --color-vayu: #2d8f6f;
+  --color-vayu-light: #3db88e;
+  --color-tejas: #c9302c;
+  --color-tejas-light: #e74c3c;
+  --color-prithvi: #d4a017;
+  --color-prithvi-light: #f1c40f;
+  --color-apas: #b0bec5;
+  --color-apas-light: #eceff1;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+  color: #e0e0e0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
