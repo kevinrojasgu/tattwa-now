@@ -1,4 +1,5 @@
-import type { TattwaName } from '../lib/tattwaData';
+import { type TattwaName } from '../lib/tattwaData';
+import { ANIMATION_CONFIG } from '../lib/animationConfig';
 
 interface ElementAnimationProps {
   tattwa: TattwaName;
@@ -12,73 +13,77 @@ interface ElementAnimationProps {
  * with Saturn's ringed planet silhouette.
  */
 function AkashAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationProps, 'tattwa'>) {
+  const config = ANIMATION_CONFIG.Akash;
   return (
     <svg viewBox="0 0 200 120" className="w-full h-full">
       <defs>
-        <radialGradient id="akash-glow" cx="50%" cy="50%">
-          <stop offset="0%" stopColor={colorHex} stopOpacity="0.2" />
-          <stop offset="100%" stopColor={colorHex} stopOpacity="0" />
+        <radialGradient id="akash-void" cx="50%" cy="50%">
+          <stop offset="0%" stopColor={colorHex} stopOpacity={config.voidGlow.opacity} />
+          <stop offset="70%" stopColor={colorHex} stopOpacity={config.voidGlow.opacity * 0.16} />
+          <stop offset="100%" stopColor="#000" stopOpacity="0" />
         </radialGradient>
+        <filter id="akash-glow">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+        </filter>
       </defs>
 
-      {/* Background glow */}
-      <circle cx="100" cy="60" r="50" fill="url(#akash-glow)" />
+      {/* Deep void center */}
+      <circle cx="100" cy="60" r={config.voidGlow.radius} fill="url(#akash-void)" />
 
-      {/* Dissolving concentric rings */}
-      {[0, 1, 2, 3].map((i) => (
+      {/* Vanishing concentric rings */}
+      {[...Array(config.rings.count)].map((_, i) => (
         <circle
           key={i}
           cx="100"
           cy="60"
-          r="12"
+          r="10"
           fill="none"
           stroke={colorLight}
-          strokeWidth="0.8"
+          strokeWidth={config.rings.strokeWidth}
           opacity="0"
           className="akash-ring"
-          style={{ animationDelay: `${i * 1.5}s` }}
+          style={{ animationDelay: `${i * config.rings.intervalDelay}s` }}
         />
       ))}
 
-      {/* Floating void particles */}
-      {[
-        { cx: 70, cy: 45, d: 0 }, { cx: 130, cy: 50, d: 0.8 },
-        { cx: 85, cy: 75, d: 1.6 }, { cx: 115, cy: 40, d: 2.4 },
-        { cx: 90, cy: 55, d: 3.2 }, { cx: 110, cy: 70, d: 4 },
-      ].map((p, i) => (
+      {/* Floating starlight/void particles */}
+      {[...Array(config.particles.count)].map((_, i) => (
         <circle
           key={i}
-          cx={p.cx}
-          cy={p.cy}
-          r="1.5"
+          cx={70 + Math.random() * 60}
+          cy={30 + Math.random() * 60}
+          r={config.particles.minSize + Math.random() * (config.particles.maxSize - config.particles.minSize)}
           fill={colorLight}
           className="akash-particle"
-          style={{ animationDelay: `${p.d}s` }}
+          style={{
+            animationDelay: `${Math.random() * 4}s`,
+            opacity: 0.2 + Math.random() * 0.5
+          }}
         />
       ))}
 
-      {/* Saturn planet body */}
-      <circle cx="100" cy="60" r="10" fill={colorHex} opacity="0.3" />
-      <circle cx="100" cy="60" r="10" fill="none" stroke={colorLight} strokeWidth="1" opacity="0.6" />
-
-      {/* Saturn ring - tilted ellipse */}
-      <ellipse
-        cx="100" cy="60" rx="20" ry="5"
-        fill="none"
-        stroke={colorLight}
-        strokeWidth="1.2"
-        opacity="0.5"
-        className="saturn-ring-rotate"
-      />
+      {/* Saturn's haunting presence */}
+      <g opacity={config.saturn.opacity}>
+        <circle cx="100" cy="60" r="11" fill={colorHex} opacity="0.3" />
+        <circle cx="100" cy="60" r="11" fill="none" stroke={colorLight} strokeWidth="1" opacity="0.6" />
+        <ellipse
+          cx="100" cy="60" rx="24" ry="6"
+          fill="none"
+          stroke={colorLight}
+          strokeWidth="1.5"
+          opacity={config.saturn.ringOpacity}
+          className="saturn-ring-rotate"
+        />
+      </g>
 
       {/* Planet symbol ♄ */}
       <text
-        x="100" y="100"
+        x="100" y="105"
         textAnchor="middle"
         fill={color}
-        fontSize="14"
+        fontSize="15"
         fontFamily="serif"
-        opacity="0.4"
+        opacity={config.symbolOpacity}
         className="planet-symbol-float"
       >
         ♄
@@ -92,74 +97,81 @@ function AkashAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationPr
  * and Mercury's swift winged essence.
  */
 function VayuAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationProps, 'tattwa'>) {
+  const config = ANIMATION_CONFIG.Vayu;
   return (
     <svg viewBox="0 0 200 120" className="w-full h-full">
       <defs>
         <linearGradient id="vayu-wind" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor={colorLight} stopOpacity="0" />
-          <stop offset="50%" stopColor={colorLight} stopOpacity="0.6" />
+          <stop offset="50%" stopColor={colorLight} stopOpacity="0.5" />
           <stop offset="100%" stopColor={colorLight} stopOpacity="0" />
         </linearGradient>
+        <filter id="vayu-blur">
+          <feGaussianBlur stdDeviation="1.5" />
+        </filter>
       </defs>
 
-      {/* Wind current lines - flowing */}
-      {[
-        { d: 'M 20,40 Q 60,25 100,40 T 180,40', delay: '0s', y: 0 },
-        { d: 'M 10,55 Q 50,42 90,55 T 190,55', delay: '0.5s', y: 0 },
-        { d: 'M 30,70 Q 70,57 110,70 T 180,70', delay: '1s', y: 0 },
-        { d: 'M 15,85 Q 55,72 95,85 T 185,85', delay: '1.5s', y: 0 },
-      ].map((line, i) => (
+      {/* Wind current lines - more wispy and varied */}
+      {config.windLines.map((line, i) => (
         <path
           key={i}
           d={line.d}
           fill="none"
           stroke={colorLight}
-          strokeWidth="1"
+          strokeWidth={line.width}
           strokeLinecap="round"
-          opacity="0.3"
+          opacity={line.opacity}
           className="vayu-wind-line"
-          style={{ animationDelay: line.delay }}
+          style={{ animationDelay: line.delay, filter: 'url(#vayu-blur)' }}
         />
       ))}
 
-      {/* Swirling air vortex particles */}
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+      {/* Increased swirling air particles */}
+      {[...Array(config.particles.count)].map((_, i) => (
         <circle
           key={i}
           cx="100"
           cy="60"
-          r="1.2"
+          r={config.particles.minSize + Math.random() * (config.particles.maxSize - config.particles.minSize)}
           fill={colorLight}
           className="vayu-swirl-particle"
           style={{
-            animationDelay: `${i * 0.6}s`,
-            animationDuration: '4.8s',
+            animationDelay: `${i * 0.4}s`,
+            animationDuration: `${config.particles.minSpeed + Math.random() * (config.particles.maxSpeed - config.particles.minSpeed)}s`,
+            opacity: 0.3 + Math.random() * 0.3
           }}
         />
       ))}
 
-      {/* Central air whorl */}
-      <path
-        d="M 95,55 Q 100,50 105,55 Q 110,60 105,65 Q 100,70 95,65 Q 88,60 95,55"
-        fill="none"
-        stroke={colorLight}
-        strokeWidth="1"
-        opacity="0.4"
-        className="vayu-whorl"
-      />
+      {/* Central air whorl - more complex */}
+      <g className="vayu-whorl" opacity={config.whorl.opacity}>
+        <path
+          d="M 90,60 Q 100,45 110,60 Q 120,75 110,90 Q 100,105 90,90 Q 80,75 90,60"
+          fill="none"
+          stroke={colorLight}
+          strokeWidth="0.8"
+          transform="scale(0.6) translate(66, 40)"
+        />
+        <path
+          d="M 95,55 Q 100,50 105,55 Q 110,60 105,65 Q 100,70 95,65 Q 88,60 95,55"
+          fill="none"
+          stroke={colorLight}
+          strokeWidth="1"
+        />
+      </g>
 
-      {/* Mercury sphere hint */}
-      <circle cx="100" cy="58" r="6" fill={colorHex} opacity="0.2" />
-      <circle cx="100" cy="58" r="6" fill="none" stroke={colorLight} strokeWidth="0.8" opacity="0.4" />
+      {/* Mercury swift essence */}
+      <circle cx="100" cy="58" r="7" fill={colorHex} opacity={config.mercury.opacity} />
+      <circle cx="100" cy="58" r="7" fill="none" stroke={colorLight} strokeWidth="1" opacity={config.mercury.opacity * 1.33} />
 
       {/* Planet symbol ☿ */}
       <text
-        x="100" y="100"
+        x="100" y="105"
         textAnchor="middle"
         fill={color}
-        fontSize="14"
+        fontSize="15"
         fontFamily="serif"
-        opacity="0.4"
+        opacity={config.symbolOpacity}
         className="planet-symbol-float"
       >
         ☿
@@ -169,20 +181,25 @@ function VayuAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationPro
 }
 
 /**
- * Tejas / Fire / Sun+Mars — flickering flames rising upward,
- * sparking embers, and a radiant sun core.
+ * Tejas / Fire / Sun+Mars — Configurable version 2
+ * Flickering flames rising upward, sparking embers, and a radiant sun core.
  */
 function TejasAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationProps, 'tattwa'>) {
+  const config = ANIMATION_CONFIG.Tejas;
+
   return (
     <svg viewBox="0 0 200 120" className="w-full h-full">
       <defs>
         <radialGradient id="tejas-core" cx="50%" cy="60%">
-          <stop offset="0%" stopColor={colorLight} stopOpacity="0.3" />
-          <stop offset="60%" stopColor={colorHex} stopOpacity="0.1" />
+          <stop offset="0%" stopColor={colorLight} stopOpacity={config.coreGlow.opacity} />
+          <stop offset="60%" stopColor={colorHex} stopOpacity={config.coreGlow.opacity * 0.4} />
           <stop offset="100%" stopColor={colorHex} stopOpacity="0" />
         </radialGradient>
+        <filter id="tejas-blur">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+        </filter>
         <filter id="tejas-glow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feGaussianBlur stdDeviation="3.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -190,94 +207,109 @@ function TejasAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationPr
         </filter>
       </defs>
 
-      {/* Heat glow */}
-      <ellipse cx="100" cy="70" rx="40" ry="30" fill="url(#tejas-core)" />
+      {/* Deep heat glow */}
+      <ellipse cx="100" cy="75" rx={config.coreGlow.rx} ry={config.coreGlow.ry} fill="url(#tejas-core)" />
 
-      {/* Flame tongues */}
-      {[
-        { d: 'M 100,80 Q 96,55 100,30 Q 104,55 100,80', delay: '0s', x: 0 },
-        { d: 'M 88,82 Q 82,60 88,40 Q 92,60 88,82', delay: '0.3s', x: -2 },
-        { d: 'M 112,82 Q 108,60 112,40 Q 118,60 112,82', delay: '0.6s', x: 2 },
-        { d: 'M 78,85 Q 74,70 80,55 Q 84,70 78,85', delay: '0.9s', x: -1 },
-        { d: 'M 122,85 Q 118,70 120,55 Q 126,70 122,85', delay: '1.2s', x: 1 },
-      ].map((flame, i) => (
+      {/* Central flame core */}
+      <path
+        d="M 100,85 Q 90,60 100,35 Q 110,60 100,85"
+        fill={colorHex}
+        opacity="0.4"
+        filter="url(#tejas-blur)"
+        className="tejas-flame"
+        style={{ animationDuration: '1.2s' }}
+      />
+
+      {/* Dynamic flame tongues from config */}
+      {config.flames.map((flame, i) => (
         <path
           key={i}
           d={flame.d}
-          fill={colorLight}
-          opacity="0.2"
+          fill={flame.color || colorLight}
+          opacity={flame.opacity}
           filter="url(#tejas-glow)"
           className="tejas-flame"
-          style={{ animationDelay: flame.delay, transformOrigin: 'center bottom' }}
+          style={{
+            animationDelay: flame.delay,
+            animationDuration: flame.speed,
+            transformOrigin: 'center bottom',
+            mixBlendMode: 'screen'
+          }}
         />
       ))}
 
-      {/* Rising embers */}
-      {[
-        { cx: 92, delay: 0 }, { cx: 105, delay: 0.7 },
-        { cx: 98, delay: 1.4 }, { cx: 110, delay: 2.1 },
-        { cx: 87, delay: 2.8 }, { cx: 115, delay: 3.5 },
-      ].map((ember, i) => (
-        <circle
-          key={i}
-          cx={ember.cx}
-          cy="80"
-          r="1.5"
-          fill={colorLight}
-          className="tejas-ember"
-          style={{ animationDelay: `${ember.delay}s` }}
-        />
-      ))}
+      {/* Configurable embers */}
+      {[...Array(config.embers.count)].map((_, i) => {
+        const delay = config.embers.minDelay + (Math.random() * (config.embers.maxDelay - config.embers.minDelay));
+        const size = config.embers.minSize + (Math.random() * (config.embers.maxSize - config.embers.minSize));
+        const cx = 85 + (Math.random() * 30);
+        return (
+          <circle
+            key={i}
+            cx={cx}
+            cy="85"
+            r={size}
+            fill={colorLight}
+            className="tejas-ember"
+            style={{
+              animationDelay: `${delay}s`,
+              animationDuration: config.embers.riseSpeed
+            }}
+          />
+        );
+      })}
 
-      {/* Sun/Mars core */}
-      <circle cx="100" cy="65" r="8" fill={colorHex} opacity="0.3" className="tejas-core-pulse" />
-      <circle cx="100" cy="65" r="8" fill="none" stroke={colorLight} strokeWidth="1" opacity="0.5" />
+      {/* Sun/Mars core - more radiant highlight at top of flames */}
+      <circle cx="100" cy={config.sun.y} r="9" fill={config.sun.color} opacity="0.4" className="tejas-core-pulse" />
+      <circle cx="100" cy={config.sun.y} r="9" fill="none" stroke={config.sun.color} strokeWidth="1.2" opacity="0.6" filter="url(#tejas-glow)" />
 
-      {/* Sun rays */}
-      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => {
+      {/* Dynamic Sun rays from config */}
+      {[...Array(config.sunRays.count)].map((_, i) => {
+        const angle = (i * 360) / config.sunRays.count;
         const rad = (angle * Math.PI) / 180;
-        const x1 = 100 + Math.cos(rad) * 11;
-        const y1 = 65 + Math.sin(rad) * 11;
-        const x2 = 100 + Math.cos(rad) * 16;
-        const y2 = 65 + Math.sin(rad) * 16;
+        const x1 = 100 + Math.cos(rad) * config.sunRays.radiusInner;
+        const y1 = config.sun.y + Math.sin(rad) * config.sunRays.radiusInner;
+        const x2 = 100 + Math.cos(rad) * config.sunRays.radiusOuter;
+        const y2 = config.sun.y + Math.sin(rad) * config.sunRays.radiusOuter;
         return (
           <line
-            key={angle}
+            key={i}
             x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke={colorLight}
-            strokeWidth="0.8"
+            stroke={config.sun.color}
+            strokeWidth="1"
             strokeLinecap="round"
-            opacity="0.3"
+            opacity={config.sunRays.intensity}
             className="tejas-ray"
-            style={{ animationDelay: `${angle / 360}s`, transformOrigin: '100px 65px' }}
+            style={{
+              animationDelay: `${angle / 360}s`,
+              transformOrigin: `100px ${config.sun.y}px`
+            }}
           />
         );
       })}
 
       {/* Planet symbols ☉ ♂ */}
-      <text
-        x="88" y="105"
-        textAnchor="middle"
-        fill={color}
-        fontSize="12"
-        fontFamily="serif"
-        opacity="0.4"
-        className="planet-symbol-float"
-      >
-        ☉
-      </text>
-      <text
-        x="112" y="105"
-        textAnchor="middle"
-        fill={color}
-        fontSize="12"
-        fontFamily="serif"
-        opacity="0.35"
-        className="planet-symbol-float"
-        style={{ animationDelay: '1s' }}
-      >
-        ♂
-      </text>
+      <g className="planet-symbol-float" opacity={config.symbolOpacity}>
+        <text
+          x="88" y="108"
+          textAnchor="middle"
+          fill={color}
+          fontSize="13"
+          fontFamily="serif"
+        >
+          ☉
+        </text>
+        <text
+          x="112" y="108"
+          textAnchor="middle"
+          fill={color}
+          fontSize="13"
+          fontFamily="serif"
+          style={{ animationDelay: '1.5s' }}
+        >
+          ♂
+        </text>
+      </g>
     </svg>
   );
 }
@@ -287,85 +319,66 @@ function TejasAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationPr
  * geometric ground formations, and Jupiter's benevolent presence.
  */
 function PrithviAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationProps, 'tattwa'>) {
+  const config = ANIMATION_CONFIG.Prithvi;
   return (
     <svg viewBox="0 0 200 120" className="w-full h-full">
       <defs>
         <linearGradient id="prithvi-ground" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor={colorHex} stopOpacity="0" />
-          <stop offset="100%" stopColor={colorHex} stopOpacity="0.15" />
+          <stop offset="100%" stopColor={colorHex} stopOpacity={config.ground.opacity} />
         </linearGradient>
+        <filter id="prithvi-glint">
+          <feGaussianBlur stdDeviation="0.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
       </defs>
 
-      {/* Ground layer */}
-      <rect x="0" y="85" width="200" height="35" fill="url(#prithvi-ground)" />
+      {/* solid earthen ground foundation */}
+      <rect x="0" y={120 - config.ground.height} width="200" height={config.ground.height} fill="url(#prithvi-ground)" />
+      <line x1="0" y1={120 - config.ground.height} x2="200" y2={120 - config.ground.height} stroke={colorLight} strokeWidth="0.5" opacity="0.3" />
 
-      {/* Crystal formations growing up */}
-      {[
-        { x: 60, h: 30, w: 8, delay: 0 },
-        { x: 80, h: 40, w: 10, delay: 0.3 },
-        { x: 100, h: 50, w: 12, delay: 0.6 },
-        { x: 120, h: 35, w: 9, delay: 0.9 },
-        { x: 140, h: 25, w: 7, delay: 1.2 },
-      ].map((crystal, i) => (
+      {/* Crystalline cluster growth */}
+      {config.crystals.map((crystal, i) => (
         <g key={i} className="prithvi-crystal" style={{ animationDelay: `${crystal.delay}s` }}>
-          <polygon
-            points={`
-              ${crystal.x},${90}
-              ${crystal.x + crystal.w / 2},${90 - crystal.h}
-              ${crystal.x + crystal.w},${90}
-            `}
+          <path
+            d={`M ${crystal.x},90 L ${crystal.x + crystal.w / 2},${90 - crystal.h} L ${crystal.x + crystal.w},90 Z`}
             fill={colorHex}
+            opacity="0.3"
+            stroke={colorLight}
+            strokeWidth="1"
+          />
+          {/* Internal facets */}
+          <line x1={crystal.x + crystal.w / 2} y1={90 - crystal.h} x2={crystal.x + crystal.w * 0.4} y2={90} stroke={colorLight} strokeWidth="0.4" opacity="0.4" />
+        </g>
+      ))}
+
+      {/* Floating geometric mineral essence */}
+      {config.gems.map((gem, i) => (
+        <g key={i} className="prithvi-gem-float" style={{ animationDelay: `${gem.d}s`, transformOrigin: `${gem.cx}px ${gem.cy}px` }}>
+          <polygon
+            points={`${gem.cx},${gem.cy - gem.s} ${gem.cx + gem.s},${gem.cy} ${gem.cx},${gem.cy + gem.s} ${gem.cx - gem.s},${gem.cy}`}
+            fill={colorLight}
             opacity="0.2"
             stroke={colorLight}
             strokeWidth="0.8"
-          />
-          {/* Inner facet */}
-          <line
-            x1={crystal.x + crystal.w / 2}
-            y1={90 - crystal.h}
-            x2={crystal.x + crystal.w * 0.35}
-            y2={90}
-            stroke={colorLight}
-            strokeWidth="0.4"
-            opacity="0.3"
+            filter="url(#prithvi-glint)"
           />
         </g>
       ))}
 
-      {/* Geometric diamond patterns floating */}
-      {[
-        { cx: 50, cy: 50, s: 6, d: 0 },
-        { cx: 150, cy: 45, s: 5, d: 1.5 },
-        { cx: 75, cy: 35, s: 4, d: 3 },
-        { cx: 130, cy: 30, s: 4.5, d: 4.5 },
-      ].map((gem, i) => (
-        <polygon
-          key={i}
-          points={`${gem.cx},${gem.cy - gem.s} ${gem.cx + gem.s},${gem.cy} ${gem.cx},${gem.cy + gem.s} ${gem.cx - gem.s},${gem.cy}`}
-          fill={colorLight}
-          opacity="0.15"
-          stroke={colorLight}
-          strokeWidth="0.6"
-          className="prithvi-gem-float"
-          style={{ animationDelay: `${gem.d}s`, transformOrigin: `${gem.cx}px ${gem.cy}px` }}
-        />
-      ))}
-
-      {/* Jupiter body */}
-      <circle cx="100" cy="40" r="9" fill={colorHex} opacity="0.2" />
-      <circle cx="100" cy="40" r="9" fill="none" stroke={colorLight} strokeWidth="0.8" opacity="0.4" />
-      {/* Jupiter bands */}
-      <ellipse cx="100" cy="38" rx="8" ry="1.5" fill="none" stroke={colorLight} strokeWidth="0.5" opacity="0.3" />
-      <ellipse cx="100" cy="43" rx="7" ry="1.2" fill="none" stroke={colorLight} strokeWidth="0.5" opacity="0.25" />
+      {/* Jupiter's stable presence */}
+      <circle cx="100" cy="42" r="10" fill={colorHex} opacity={config.jupiter.opacity * 0.625} />
+      <circle cx="100" cy="42" r="10" fill="none" stroke={colorLight} strokeWidth="1" opacity={config.jupiter.opacity} />
+      <path d="M 91,40 Q 100,38 109,40 M 92,44 Q 100,46 108,44" fill="none" stroke={colorLight} strokeWidth="0.6" opacity="0.3" />
 
       {/* Planet symbol ♃ */}
       <text
-        x="100" y="105"
+        x="100" y="108"
         textAnchor="middle"
         fill={color}
-        fontSize="14"
+        fontSize="15"
         fontFamily="serif"
-        opacity="0.4"
+        opacity={config.symbolOpacity}
         className="planet-symbol-float"
       >
         ♃
@@ -379,83 +392,82 @@ function PrithviAnimation({ color, colorLight, colorHex }: Omit<ElementAnimation
  * falling droplets, and Venus's graceful presence.
  */
 function ApasAnimation({ color, colorLight, colorHex }: Omit<ElementAnimationProps, 'tattwa'>) {
+  const config = ANIMATION_CONFIG.Apas;
   return (
     <svg viewBox="0 0 200 120" className="w-full h-full">
       <defs>
         <radialGradient id="apas-pool" cx="50%" cy="70%">
-          <stop offset="0%" stopColor={colorHex} stopOpacity="0.12" />
+          <stop offset="0%" stopColor={colorHex} stopOpacity={config.pool.opacity} />
           <stop offset="100%" stopColor={colorHex} stopOpacity="0" />
         </radialGradient>
+        <filter id="apas-shimmer">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feSpecularLighting specularConstant="1.2" specularExponent="20" lightingColor={colorLight} in="blur" result="specular">
+            <fePointLight x="100" y="40" z="20" />
+          </feSpecularLighting>
+          <feComposite in="SourceGraphic" in2="specular" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+        </filter>
       </defs>
 
       {/* Water pool glow */}
-      <ellipse cx="100" cy="75" rx="60" ry="20" fill="url(#apas-pool)" />
+      <ellipse cx="100" cy="80" rx={config.pool.rx} ry={config.pool.ry} fill="url(#apas-pool)" />
 
       {/* Expanding ripple circles */}
-      {[0, 1, 2, 3].map((i) => (
+      {[...Array(config.ripples.count)].map((_, i) => (
         <ellipse
           key={i}
           cx="100"
-          cy="75"
+          cy="80"
           rx="8"
           ry="3"
           fill="none"
           stroke={colorLight}
-          strokeWidth="0.8"
+          strokeWidth="1"
+          opacity="0"
           className="apas-ripple"
-          style={{ animationDelay: `${i * 1.2}s` }}
+          style={{ animationDelay: `${i * config.ripples.delayInterval}s` }}
         />
       ))}
 
-      {/* Wave pattern */}
-      <path
-        d="M 30,70 Q 50,62 70,70 T 110,70 T 150,70 T 190,70"
-        fill="none"
-        stroke={colorLight}
-        strokeWidth="0.8"
-        opacity="0.25"
-        className="apas-wave"
-      />
-      <path
-        d="M 20,78 Q 40,72 60,78 T 100,78 T 140,78 T 180,78"
-        fill="none"
-        stroke={colorLight}
-        strokeWidth="0.6"
-        opacity="0.2"
-        className="apas-wave"
-        style={{ animationDelay: '1s' }}
-      />
+      {/* Wave patterns - more fluid from config */}
+      {config.waves.map((wave, i) => (
+        <path
+          key={i}
+          d={wave.d}
+          fill="none"
+          stroke={colorLight}
+          strokeWidth="0.8"
+          opacity={wave.opacity}
+          className="apas-wave"
+          style={{ animationDelay: wave.delay }}
+        />
+      ))}
 
-      {/* Falling water droplets */}
-      {[
-        { cx: 85, delay: 0 }, { cx: 100, delay: 0.8 },
-        { cx: 115, delay: 1.6 }, { cx: 92, delay: 2.4 },
-        { cx: 108, delay: 3.2 },
-      ].map((drop, i) => (
+      {/* Falling raindrops from config */}
+      {config.drops.map((drop, i) => (
         <g key={i} className="apas-drop" style={{ animationDelay: `${drop.delay}s` }}>
-          {/* Teardrop shape */}
           <path
-            d={`M ${drop.cx},20 Q ${drop.cx - 2.5},30 ${drop.cx},34 Q ${drop.cx + 2.5},30 ${drop.cx},20`}
+            d={`M ${drop.cx},15 Q ${drop.cx - 2},25 ${drop.cx},30 Q ${drop.cx + 2},25 ${drop.cx},15`}
             fill={colorLight}
-            opacity="0.35"
+            opacity="0.4"
           />
         </g>
       ))}
 
-      {/* Venus mirror body */}
-      <circle cx="100" cy="45" r="7" fill={colorHex} opacity="0.2" />
-      <circle cx="100" cy="45" r="7" fill="none" stroke={colorLight} strokeWidth="0.8" opacity="0.4" />
-      {/* Venus shimmer */}
-      <circle cx="97" cy="43" r="2" fill={colorLight} opacity="0.1" />
+      {/* Venus shimmer presence */}
+      <g filter={config.venus.shimmer ? "url(#apas-shimmer)" : undefined}>
+        <circle cx="100" cy="45" r="8" fill={colorHex} opacity={config.venus.opacity * 0.75} />
+        <circle cx="100" cy="45" r="8" fill="none" stroke={colorLight} strokeWidth="1" opacity={config.venus.opacity} />
+      </g>
 
       {/* Planet symbol ♀ */}
       <text
-        x="100" y="108"
+        x="100" y="110"
         textAnchor="middle"
         fill={color}
-        fontSize="14"
+        fontSize="15"
         fontFamily="serif"
-        opacity="0.4"
+        opacity={config.symbolOpacity}
         className="planet-symbol-float"
       >
         ♀

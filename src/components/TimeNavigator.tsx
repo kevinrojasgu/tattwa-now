@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
+import { getSunTimes } from '../lib/sunrise';
 
 interface TimeNavigatorProps {
   /** null = live mode, Date = time-travel */
@@ -9,6 +10,8 @@ interface TimeNavigatorProps {
   /** Controlled open state for the date picker panel — managed by parent */
   isPickerOpen: boolean;
   onPickerOpenChange: (open: boolean) => void;
+  lat: number;
+  lng: number;
 }
 
 /**
@@ -19,7 +22,7 @@ function toDatetimeLocal(d: Date): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function TimeNavigator({ viewedDate, onGoLive, onDateChange, isPickerOpen, onPickerOpenChange }: TimeNavigatorProps) {
+export function TimeNavigator({ viewedDate, onGoLive, onDateChange, isPickerOpen, onPickerOpenChange, lat, lng }: TimeNavigatorProps) {
   const { t } = useLanguage();
   const isLive = viewedDate === null;
   const [liveTime, setLiveTime] = useState(new Date());
@@ -64,8 +67,8 @@ export function TimeNavigator({ viewedDate, onGoLive, onDateChange, isPickerOpen
   }
 
   const presets = [
-    { label: t.yesterdaySunrise, offsetHours: -24 + 6 },
-    { label: t.tomorrowSunrise, offsetHours: 24 + 6 },
+    { label: t.yesterdaySunrise, type: 'yesterday' as const },
+    { label: t.tomorrowSunrise, type: 'tomorrow' as const },
   ];
 
   return (
@@ -126,11 +129,10 @@ export function TimeNavigator({ viewedDate, onGoLive, onDateChange, isPickerOpen
             {/* Date picker toggle */}
             <button
               onClick={() => onPickerOpenChange(!isPickerOpen)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 active:scale-95 ${
-                isPickerOpen
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300 active:scale-95 ${isPickerOpen
                   ? 'bg-white/15 text-white/90'
                   : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80'
-              }`}
+                }`}
               title="Pick a date & time"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -192,8 +194,13 @@ export function TimeNavigator({ viewedDate, onGoLive, onDateChange, isPickerOpen
                     key={preset.label}
                     onClick={() => {
                       const d = new Date();
-                      d.setHours(d.getHours() + preset.offsetHours, 0, 0, 0);
-                      onDateChange(d);
+                      if (preset.type === 'yesterday') {
+                        d.setDate(d.getDate() - 1);
+                      } else {
+                        d.setDate(d.getDate() + 1);
+                      }
+                      const sun = getSunTimes(d, lat, lng);
+                      onDateChange(sun.sunrise);
                     }}
                     className="px-3 py-2.5 rounded-lg text-xs bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80 transition-all duration-200 active:scale-95 whitespace-nowrap"
                   >

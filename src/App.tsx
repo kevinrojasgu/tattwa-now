@@ -112,6 +112,8 @@ function App() {
             onDateChange={handleDateChange}
             isPickerOpen={openPanel === 'time'}
             onPickerOpenChange={handlePickerOpenChange}
+            lat={location.lat}
+            lng={location.lng}
           />
 
           {/* Main Tattwa Card */}
