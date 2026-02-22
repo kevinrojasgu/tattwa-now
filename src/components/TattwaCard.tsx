@@ -5,9 +5,15 @@ import { TattwaShape } from './TattwaShapes';
 import { SubTattwa } from './SubTattwa';
 import { ElementAnimation } from './ElementAnimation';
 import { formatTime } from '../lib/sunrise';
+import { useLanguage } from '../hooks/useLanguage';
+import { translateValue } from '../lib/i18n';
 
 interface TattwaCardProps {
   state: TattwaState;
+  /** Whether we're showing live (real-time) data */
+  isLive?: boolean;
+  /** The date being viewed */
+  viewedDate?: Date;
 }
 
 function formatCountdown(seconds: number): string {
@@ -66,9 +72,35 @@ function useTattwaTransition(tattwa: TattwaName) {
   return isTransitioning;
 }
 
-export function TattwaCard({ state }: TattwaCardProps) {
+export function TattwaCard({ state, isLive = true, viewedDate }: TattwaCardProps) {
+  const { t, lang } = useLanguage();
   const info = TATTWAS[state.tattwa];
   const isTransitioning = useTattwaTransition(state.tattwa);
+
+  function formatViewedLabel(): string {
+    if (isLive || !viewedDate) return t.currentTattwa;
+    return (
+      viewedDate.toLocaleDateString(t.dateLocale, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }) +
+      ' · ' +
+      viewedDate.toLocaleTimeString(t.dateLocale, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+    );
+  }
+
+  const props = [
+    { label: t.planet, value: translateValue(info.planet, lang) },
+    { label: t.direction, value: translateValue(info.direction, lang) },
+    { label: t.sense, value: translateValue(info.sense, lang) },
+    { label: t.mantra, value: info.mantra },
+  ];
 
   return (
     <div
@@ -108,8 +140,24 @@ export function TattwaCard({ state }: TattwaCardProps) {
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
-            <div className="text-xs uppercase tracking-wider text-white/50 mb-1">
-              Current Tattwa
+            <div className="text-xs uppercase tracking-wider text-white/50 mb-1 flex items-center gap-2">
+              {isLive ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-50 animate-ping" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+                  </span>
+                  {t.currentTattwa}
+                </>
+              ) : (
+                <>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-amber-400/70">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <span className="normal-case tracking-normal">{formatViewedLabel()}</span>
+                </>
+              )}
             </div>
             <h2
               className="text-3xl sm:text-4xl font-bold tracking-tight transition-colors duration-700"
@@ -118,7 +166,7 @@ export function TattwaCard({ state }: TattwaCardProps) {
               {state.tattwa}
             </h2>
             <div className="text-sm text-white/70 mt-1">
-              {info.element} &middot; {info.nature}
+              {translateValue(info.element, lang)} &middot; {translateValue(info.nature, lang)}
             </div>
           </div>
           <div className="text-right">
@@ -138,7 +186,7 @@ export function TattwaCard({ state }: TattwaCardProps) {
         <div
           className="my-4 rounded-xl overflow-hidden"
           style={{ background: `linear-gradient(180deg, ${info.colorHex}08 0%, ${info.colorHex}03 100%)` }}
-          key={state.tattwa} /* re-mount on tattwa change so animation replays */
+          key={state.tattwa}
         >
           <div className="h-[100px] sm:h-[120px]">
             <ElementAnimation
@@ -154,7 +202,7 @@ export function TattwaCard({ state }: TattwaCardProps) {
         <div className="mb-4">
           <div className="flex items-baseline gap-2">
             <AnimatedCountdown seconds={state.secondsRemaining} color={info.colorLight} />
-            <span className="text-sm text-white/50">remaining</span>
+            <span className="text-sm text-white/50">{t.remaining}</span>
           </div>
         </div>
 
@@ -175,12 +223,7 @@ export function TattwaCard({ state }: TattwaCardProps) {
 
         {/* Properties row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-          {[
-            { label: 'Planet', value: info.planet },
-            { label: 'Direction', value: info.direction },
-            { label: 'Sense', value: info.sense },
-            { label: 'Mantra', value: info.mantra },
-          ].map((prop, i) => (
+          {props.map((prop, i) => (
             <div
               key={prop.label}
               className="bg-white/5 rounded-lg px-3 py-2 transition-all duration-300 hover:bg-white/10 hover:scale-[1.02]"
@@ -194,7 +237,7 @@ export function TattwaCard({ state }: TattwaCardProps) {
 
         {/* Sunrise info */}
         <div className="mt-3 text-xs text-white/40">
-          Cycle started at sunrise: {formatTime(state.sunrise)} &middot; Cycle #{state.cycleNumber + 1}
+          {t.cycleStartedSunrise} {formatTime(state.sunrise)} &middot; {t.cycle}{state.cycleNumber + 1}
         </div>
 
         {/* Sub-tattwa */}

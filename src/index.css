@@ -421,3 +421,69 @@ body {
   90% { opacity: 0.1; }
   100% { transform: translateY(50px); opacity: 0; }
 }
+
+/* ===== Time Navigator ===== */
+
+/* "Now" button with green glow */
+.now-button {
+  background: rgba(74, 222, 128, 0.12);
+  color: rgba(74, 222, 128, 0.9);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+}
+.now-button:hover {
+  background: rgba(74, 222, 128, 0.2);
+  border-color: rgba(74, 222, 128, 0.35);
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.15);
+}
+
+/* Time-travel banner */
+.time-travel-banner {
+  background: rgba(251, 191, 36, 0.04);
+}
+
+/* ===== Dark-themed datetime-local input ===== */
+
+/* The native input is invisible but stretches to fill its container,
+   so tapping anywhere opens the native date/time picker. */
+.datepicker-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: default;
+  box-sizing: border-box;
+  color-scheme: dark;
+}
+.datepicker-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  background-color: black important;
+  border: none important;
+  padding: 0 important;
+  margin: 0 important;
+  font-size: inherit important;
+  font-family: inherit important;
+  font-weight: inherit important;
+  line-height: inherit important;
+  text-align: inherit important;
+  text-transform: inherit important;      
+}
+
+/* Live ping animation for the card label */
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+.animate-ping {
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}

@@ -13,18 +13,8 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
   const entries = useMemo(() => getDayTimeline(now, lat, lng), [now, lat, lng]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Show 12 hours of entries (30 tattwa periods = 6 full cycles)
-  const visibleEntries = entries.slice(0, 30);
+  const currentIndex = entries.findIndex((e) => e.isCurrent);
 
-  // Find the index of the current period
-  const currentIndex = visibleEntries.findIndex((e) => e.isCurrent);
-
-  const windowSize = 15;
-  const halfWindow = Math.floor(windowSize / 2);
-  const startIdx = Math.max(0, currentIndex - halfWindow);
-  const displayEntries = visibleEntries.slice(startIdx, startIdx + windowSize);
-
-  // Auto-scroll to center current period
   useEffect(() => {
     if (scrollRef.current) {
       const currentEl = scrollRef.current.querySelector('[data-current="true"]');
@@ -41,92 +31,117 @@ export function Timeline({ now, lat, lng }: TimelineProps) {
       </h3>
 
       {/* Horizontal scrolling timeline */}
-      <div className="overflow-x-auto pb-2 -mx-2 px-2" ref={scrollRef}>
+      <div className="overflow-x-auto pb-2 -mx-2 px-2 height-[300px]" ref={scrollRef}>
+        <div className="h-5"> </div>
         <div className="flex gap-0.5 min-w-max">
-          {displayEntries.map((entry, i) => {
-            const info = TATTWAS[entry.tattwa];
-            const isCurrent = entry.isCurrent;
-            const isPast = entry.end.getTime() < now.getTime();
+          {(() => {
+            // Find index of first tattwa *after midnight* (start of day)
+            const dayStart = new Date(now);
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(now);
+            dayEnd.setHours(23, 59, 59, 999);
 
-            return (
-              <div
-                key={startIdx + i}
-                data-current={isCurrent ? 'true' : undefined}
-                className="flex flex-col items-center group relative cursor-default"
-                style={{
-                  minWidth: isCurrent ? '60px' : '40px',
-                  animation: `fadeInUp 0.3s ease-out ${i * 0.03}s both`,
-                }}
-              >
-                {/* Time label */}
-                {((startIdx + i) % 5 === 0 || isCurrent) && (
-                  <div
-                    className="mb-1 whitespace-nowrap transition-colors duration-300"
-                    style={{
-                      fontSize: '0.6rem',
-                      color: isCurrent ? info.colorLight : 'rgba(255,255,255,0.5)',
-                      fontWeight: isCurrent ? 600 : 400,
-                    }}
-                  >
-                    {formatTime(entry.start)}
-                  </div>
-                )}
-                {!((startIdx + i) % 5 === 0 || isCurrent) && (
-                  <div className="mb-1" style={{ fontSize: '0.6rem' }}>
-                    &nbsp;
-                  </div>
-                )}
+            // Find in all entries the ones that "touch" today
+            // But we want one tattwa *before* and one *after* that window as well
+            let firstIdx = entries.findIndex(e => e.end > dayStart);
+            if (firstIdx === -1) firstIdx = 0;
+            else firstIdx = Math.max(0, firstIdx - 1);
 
-                {/* Bar with hover effect */}
+            let lastIdx = entries.findIndex(e => e.start > dayEnd);
+            if (lastIdx === -1) lastIdx = entries.length - 1;
+            else lastIdx = Math.min(entries.length - 1, lastIdx + 0);
+
+            // To include one after, add 1 to lastIdx if possible
+            if (lastIdx < entries.length - 1) lastIdx = lastIdx + 1;
+
+            const timelineWindow = entries.slice(firstIdx, lastIdx + 1);
+
+            return timelineWindow.map((entry, i) => {
+              // Use the current period search relative to this slice
+              const info = TATTWAS[entry.tattwa];
+              const isCurrent = entry.isCurrent;
+              const isPast = entry.end.getTime() < now.getTime();
+
+              // Find index in parent array for proper key and labels
+              const absIdx = firstIdx + i;
+
+              return (
                 <div
-                  className="rounded-sm relative transition-all duration-300 group-hover:brightness-125"
+                  key={absIdx}
+                  data-current={isCurrent ? 'true' : undefined}
+                  className="flex flex-col items-center group relative cursor-default"
                   style={{
-                    height: isCurrent ? '32px' : '20px',
-                    width: '100%',
-                    backgroundColor: isPast
-                      ? `${info.colorHex}30`
-                      : isCurrent
-                        ? info.colorHex
-                        : `${info.colorHex}60`,
-                    boxShadow: isCurrent
-                      ? `0 0 12px ${info.colorHex}60`
-                      : 'none',
-                    transform: isCurrent ? 'scaleY(1)' : 'scaleY(1)',
+                    minWidth: isCurrent ? '60px' : '40px',
+                    animation: `fadeInUp 0.3s ease-out ${i * 0.03}s both`,
                   }}
                 >
-                  {/* Current indicator pulse */}
-                  {isCurrent && (
+                  {/* Time label */}
+                  {(absIdx % 5 === 0 || isCurrent) && (
                     <div
-                      className="absolute inset-0 rounded-sm"
+                      className="mb-1 whitespace-nowrap transition-colors duration-300"
                       style={{
-                        backgroundColor: `${info.colorLight}20`,
-                        animation: 'pulseGlow 2s ease-in-out infinite',
+                        fontSize: '0.6rem',
+                        color: isCurrent ? info.colorLight : 'rgba(255,255,255,0.5)',
+                        fontWeight: isCurrent ? 600 : 400,
+                        textShadow: isCurrent ? `0 0 4px ${info.colorHex}` : undefined,
                       }}
-                    />
+                    >
+                      {formatTime(entry.start)}
+                    </div>
+                  )}
+                  {!((absIdx % 5 === 0) || isCurrent) && (
+                    <div className="mb-1" style={{ fontSize: '0.6rem' }}>
+                      &nbsp;
+                    </div>
                   )}
 
-                  {/* Hover tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                    <div className="bg-[#1a1a2e] border border-white/10 rounded-lg px-2 py-1 whitespace-nowrap text-xs shadow-xl">
-                      <span style={{ color: info.colorLight }}>{entry.tattwa}</span>
-                      <span className="text-white/40 ml-1">{formatTime(entry.start)}</span>
+                  {/* Bar with hover effect */}
+                  <div
+                    className="rounded-sm relative transition-all duration-300 group-hover:brightness-125"
+                    style={{
+                      height: isCurrent ? '40px' : '32px',
+                      width: '100%',
+                      backgroundColor: isPast
+                        ? `${info.colorHex}30`
+                        : isCurrent
+                          ? info.colorHex
+                          : `${info.colorHex}60`,
+                      boxShadow: isCurrent
+                        ? `0 0 12px ${info.colorHex}60, 0 0 32px ${info.colorHex}30`
+                        : 'none',
+                    }}
+                  >
+                    {isCurrent && (
+                      <div
+                        className="absolute inset-0 rounded-sm"
+                        style={{
+                          backgroundColor: `${info.colorLight}20`,
+                          animation: 'pulseGlow 2s ease-in-out infinite',
+                        }}
+                      />
+                    )}
+
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                      <div className="bg-[#1a1a2e] z-10 border border-white/10 rounded-lg px-2 py-1 whitespace-nowrap text-xs shadow-xl">
+                        <span style={{ color: info.colorLight }}>{entry.tattwa}</span>
+                        <span className="text-white/40 ml-1">{formatTime(entry.start)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Tattwa initial */}
-                <div
-                  className="mt-1 font-medium transition-colors duration-300"
-                  style={{
-                    fontSize: '0.55rem',
-                    color: isCurrent ? info.colorLight : isPast ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.5)',
-                  }}
-                >
-                  {entry.tattwa.slice(0, 2)}
+                  <div
+                    className="mt-1 font-medium transition-colors duration-300"
+                    style={{
+                      fontSize: '0.55rem',
+                      color: isCurrent ? info.colorLight : isPast ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.5)',
+                    }}
+                  >
+                    {entry.tattwa.slice(0, 2)}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
       </div>
 

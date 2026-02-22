@@ -1,5 +1,7 @@
 import type { TattwaName } from '../lib/tattwaData';
 import { TATTWAS, TATTWA_ORDER } from '../lib/tattwaData';
+import { useLanguage } from '../hooks/useLanguage';
+import { translateValue } from '../lib/i18n';
 
 interface SubTattwaProps {
   mainTattwa: TattwaName;
@@ -14,12 +16,13 @@ export function SubTattwa({
   subTattwaIndex,
   subProgress,
 }: SubTattwaProps) {
+  const { t: tr, lang } = useLanguage();
   const subInfo = TATTWAS[subTattwa];
 
   return (
     <div className="mt-4">
       <div className="text-xs uppercase tracking-wider text-white/50 mb-2">
-        Sub-Tattwa
+        {tr.subTattwa}
       </div>
       <div className="flex items-center gap-2 mb-2">
         <span className="text-sm font-medium text-white/90">
@@ -29,17 +32,17 @@ export function SubTattwa({
           className="text-xs transition-colors duration-500"
           style={{ color: `${subInfo.colorLight}80` }}
         >
-          ({subInfo.element})
+          ({translateValue(subInfo.element, lang)})
         </span>
       </div>
       {/* Sub-tattwa progress dots */}
       <div className="flex gap-1.5">
-        {TATTWA_ORDER.map((t, i) => {
-          const info = TATTWAS[t];
+        {TATTWA_ORDER.map((name, i) => {
+          const info = TATTWAS[name];
           const isActive = i === subTattwaIndex;
           const isPast = i < subTattwaIndex;
           return (
-            <div key={t} className="flex-1 relative group">
+            <div key={name} className="flex-1 relative group">
               <div
                 className="h-1.5 rounded-full overflow-hidden transition-all duration-500"
                 style={{
@@ -79,15 +82,16 @@ export function SubTattwa({
                   transform: isActive ? 'scale(1.1)' : 'scale(1)',
                 }}
               >
-                {t.slice(0, 2)}
+                {name.slice(0, 2)}
               </div>
 
               {/* Tooltip on hover */}
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                <div className="bg-[#1a1a2e] border border-white/10 rounded px-1.5 py-0.5 whitespace-nowrap shadow-lg"
+                <div
+                  className="bg-[#1a1a2e] border border-white/10 rounded px-1.5 py-0.5 whitespace-nowrap shadow-lg"
                   style={{ fontSize: '0.55rem' }}
                 >
-                  <span style={{ color: info.colorLight }}>{t}</span>
+                  <span style={{ color: info.colorLight }}>{name}</span>
                 </div>
               </div>
             </div>
