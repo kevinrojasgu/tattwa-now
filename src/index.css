@@ -292,6 +292,32 @@ body {
 .akash-particle:nth-child(3n) { --drift-x: -8px; --drift-y: 12px; }
 .akash-particle:nth-child(4n) { --drift-x: 16px; --drift-y: -20px; }
 
+.akash-star {
+  animation: akashStarTwinkle 3s ease-in-out infinite;
+}
+@keyframes akashStarTwinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.2); }
+}
+
+.akash-orbit {
+  animation: akashOrbitSpin 8s linear infinite;
+  transform-origin: 100px 60px;
+}
+@keyframes akashOrbitSpin {
+  from { transform: rotate(0deg) translateX(32px); }
+  to { transform: rotate(-360deg) translateX(32px); }
+}
+
+.akash-void-pulse {
+  animation: akashVoidPulse 4s ease-in-out infinite;
+  transform-origin: 100px 60px;
+}
+@keyframes akashVoidPulse {
+  0%, 100% { transform: scale(0.9); opacity: 0.06; }
+  50% { transform: scale(1.15); opacity: 0.12; }
+}
+
 .saturn-ring-rotate {
   animation: saturnRingTilt 8s ease-in-out infinite;
   transform-origin: center;
@@ -303,40 +329,61 @@ body {
 
 /* ===== Vayu — Wind Lines ===== */
 .vayu-wind-line {
-  animation: vayuWindFlow 3s ease-in-out infinite;
-  stroke-dasharray: 8 4;
+  animation: vayuWindFlow 2.5s linear infinite;
+  stroke-dasharray: 12 8;
 }
 @keyframes vayuWindFlow {
-  0% { stroke-dashoffset: 0; opacity: 0.15; }
-  50% { stroke-dashoffset: -24; opacity: 0.4; }
-  100% { stroke-dashoffset: -48; opacity: 0.15; }
+  0% { stroke-dashoffset: 0; opacity: 0.2; }
+  50% { stroke-dashoffset: -40; opacity: 0.5; }
+  100% { stroke-dashoffset: -80; opacity: 0.2; }
 }
 
-.vayu-swirl-particle {
-  animation: vayuSwirlOrbit 4.8s linear infinite;
-  transform-origin: 100px 60px;
+.vayu-flow-particle {
+  animation: vayuFlowAcross 5s linear infinite;
 }
-@keyframes vayuSwirlOrbit {
+@keyframes vayuFlowAcross {
   0% {
-    transform: rotate(0deg) translateX(18px) scale(0.6);
+    transform: translateX(0) translateY(0);
     opacity: 0;
   }
-  15% { opacity: 0.6; }
-  85% { opacity: 0.4; }
+  5% { opacity: 0.4; }
+  90% { opacity: 0.35; }
   100% {
-    transform: rotate(360deg) translateX(18px) scale(1);
+    transform: translateX(230px) translateY(calc(var(--vayu-drift-y, 0) * 1px));
     opacity: 0;
   }
 }
 
-.vayu-whorl {
-  animation: vayuWhorlSpin 6s linear infinite;
-  transform-origin: 100px 60px;
+.vayu-flow-particle:nth-child(odd) { --vayu-drift-y: -3; }
+.vayu-flow-particle:nth-child(even) { --vayu-drift-y: 2; }
+.vayu-flow-particle:nth-child(3n) { --vayu-drift-y: 4; }
+.vayu-flow-particle:nth-child(4n) { --vayu-drift-y: -2; }
+.vayu-flow-particle:nth-child(5n) { --vayu-drift-y: 1; }
+
+.vayu-gust {
+  animation: vayuGustPulse 2.5s ease-in-out infinite;
+  stroke-dasharray: 6 4;
 }
-@keyframes vayuWhorlSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes vayuGustPulse {
+  0%, 100% { stroke-dashoffset: 0; opacity: 0.1; }
+  50% { stroke-dashoffset: -20; opacity: 0.3; }
 }
+
+.vayu-dust {
+  animation: vayuDustBlow 6s linear infinite;
+}
+@keyframes vayuDustBlow {
+  0% { transform: translateX(0) translateY(0); opacity: 0.15; }
+  15% { opacity: 0.4; }
+  85% { opacity: 0.3; }
+  100% { transform: translateX(180px) translateY(calc(var(--vayu-dust-drift, 0) * 1px)); opacity: 0.15; }
+}
+
+.vayu-dust:nth-child(odd) { --vayu-dust-drift: 5; }
+.vayu-dust:nth-child(even) { --vayu-dust-drift: -4; }
+.vayu-dust:nth-child(3n) { --vayu-dust-drift: -6; }
+.vayu-dust:nth-child(4n) { --vayu-dust-drift: 3; }
+.vayu-dust:nth-child(5n) { --vayu-dust-drift: 7; }
 
 /* ===== Tejas — Fire ===== */
 .tejas-flame {
@@ -377,50 +424,154 @@ body {
 }
 
 /* ===== Prithvi — Earth / Crystal ===== */
+.prithvi-landmass {
+  animation: prithviLandSettle 10s ease-in-out infinite;
+}
+@keyframes prithviLandSettle {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(0.6px); opacity: 0.98; }
+}
+
+.prithvi-strata {
+  animation: prithviStrataGlow 8s ease-in-out infinite;
+}
+@keyframes prithviStrataGlow {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.24; }
+}
+
 .prithvi-crystal {
-  animation: prithviCrystalGrow 4s ease-out both;
+  animation: prithviCrystalPresence 9s ease-in-out infinite;
   transform-origin: center bottom;
 }
-@keyframes prithviCrystalGrow {
-  0% { transform: scaleY(0); opacity: 0; }
-  60% { transform: scaleY(1.05); opacity: 0.9; }
-  100% { transform: scaleY(1); opacity: 1; }
+@keyframes prithviCrystalPresence {
+  0%, 100% { transform: scaleY(1); opacity: 0.7; }
+  50% { transform: scaleY(1.01); opacity: 0.95; }
 }
 
 .prithvi-gem-float {
-  animation: prithviGemFloat 5s ease-in-out infinite;
+  animation: prithviGemGlint 7s ease-in-out infinite;
 }
-@keyframes prithviGemFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
-  50% { transform: translateY(-5px) rotate(15deg); opacity: 0.3; }
+@keyframes prithviGemGlint {
+  0%, 100% { transform: scale(1); opacity: 0.1; }
+  50% { transform: scale(1.06); opacity: 0.24; }
+}
+
+.prithvi-soil {
+  animation: prithviSoilBreath 8s ease-in-out infinite;
+}
+@keyframes prithviSoilBreath {
+  0%, 100% { transform: translateY(0); opacity: 0.12; }
+  50% { transform: translateY(-0.8px); opacity: 0.22; }
+}
+
+.prithvi-seed {
+  animation: prithviSeedSettle 10s ease-in-out infinite;
+}
+@keyframes prithviSeedSettle {
+  0%, 100% { transform: scale(1); opacity: 0.1; }
+  50% { transform: scale(1.04); opacity: 0.18; }
+}
+
+.prithvi-core {
+  animation: prithviCoreGlow 7s ease-in-out infinite;
+  transform-origin: 100px 64px;
+}
+@keyframes prithviCoreGlow {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.03); opacity: 1; }
+}
+
+.prithvi-jupiter {
+  animation: prithviJupiterPulse 8s ease-in-out infinite;
+}
+@keyframes prithviJupiterPulse {
+  0%, 100% { opacity: 0.18; }
+  50% { opacity: 0.28; }
 }
 
 /* ===== Apas — Water ===== */
+.apas-pool-sway {
+  animation: apasPoolSway 6s ease-in-out infinite;
+  transform-origin: 100px 96px;
+}
+@keyframes apasPoolSway {
+  0%, 100% { transform: translateX(0) scaleY(1); opacity: 1; }
+  50% { transform: translateX(2px) scaleY(0.99); opacity: 0.97; }
+}
+
+.apas-surface {
+  animation: apasSurfaceFlow 3.5s ease-in-out infinite;
+}
+@keyframes apasSurfaceFlow {
+  0% { transform: translateX(-4px) translateY(0); opacity: 0.28; }
+  50% { transform: translateX(6px) translateY(-1px); opacity: 0.48; }
+  100% { transform: translateX(12px) translateY(0); opacity: 0.3; }
+}
+
 .apas-ripple {
-  animation: apasRippleExpand 4.8s ease-out infinite;
+  animation: apasRippleExpand 4.5s ease-out infinite;
 }
 @keyframes apasRippleExpand {
-  0% { rx: 4; ry: 1.5; opacity: 0.6; stroke-width: 1.2; }
-  100% { rx: 70; ry: 25; opacity: 0; stroke-width: 0.2; }
+  0% { rx: 4; ry: 1.3; opacity: 0.55; stroke-width: 1.1; }
+  100% { rx: 44; ry: 10; opacity: 0; stroke-width: 0.2; }
 }
 
 .apas-wave {
-  animation: apasWaveFlow 4s ease-in-out infinite;
-  stroke-dasharray: 12 6;
+  animation: apasWaveFlow 5s ease-in-out infinite;
+  stroke-dasharray: 16 8;
 }
 @keyframes apasWaveFlow {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: -36; }
+  0% { stroke-dashoffset: 0; transform: translateX(-8px); }
+  50% { transform: translateX(6px); }
+  100% { stroke-dashoffset: -44; transform: translateX(16px); }
 }
 
-.apas-drop {
-  animation: apasDropFall 3s ease-in infinite;
+.apas-caustic {
+  animation: apasCausticDrift 6s ease-in-out infinite;
 }
-@keyframes apasDropFall {
-  0% { transform: translateY(0); opacity: 0.4; }
-  70% { opacity: 0.3; }
-  90% { opacity: 0.1; }
-  100% { transform: translateY(50px); opacity: 0; }
+@keyframes apasCausticDrift {
+  0% { transform: translateX(-6px); opacity: 0.14; }
+  50% { transform: translateX(8px); opacity: 0.28; }
+  100% { transform: translateX(16px); opacity: 0.16; }
+}
+
+.apas-current-left,
+.apas-current-right {
+  animation: apasCurrentDraw 4.2s linear infinite;
+  stroke-dasharray: 18 10;
+}
+@keyframes apasCurrentDraw {
+  0% { stroke-dashoffset: 0; opacity: 0.08; transform: translateX(-6px); }
+  50% { stroke-dashoffset: -24; opacity: 0.32; }
+  100% { stroke-dashoffset: -48; opacity: 0.1; transform: translateX(14px); }
+}
+
+.apas-bubble {
+  animation: apasBubbleRise 3.2s ease-out infinite;
+}
+@keyframes apasBubbleRise {
+  0% { transform: translateX(0) translateY(0) scale(1); opacity: 0.18; }
+  20% { opacity: 0.35; }
+  60% { opacity: 0.25; }
+  100% { transform: translateX(14px) translateY(-22px) scale(0.7); opacity: 0; }
+}
+
+.apas-sparkle {
+  animation: apasSparkleTwinkle 2.8s ease-in-out infinite;
+}
+@keyframes apasSparkleTwinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.3); }
+}
+
+.apas-venus-reflection {
+  animation: apasReflectionPulse 3.4s ease-in-out infinite;
+}
+@keyframes apasReflectionPulse {
+  0% { transform: translateX(0) translateY(0) scaleX(1); opacity: 0.12; }
+  50% { transform: translateX(4px) translateY(1px) scaleX(1.12); opacity: 0.28; }
+  100% { transform: translateX(8px) translateY(0) scaleX(1.04); opacity: 0.14; }
 }
 
 /* ===== Time Navigator ===== */
@@ -487,4 +638,22 @@ body {
 }
 .animate-ping {
   animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ===== TatwaMetro — segment glow pulse ===== */
+@keyframes metroSegGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+.metro-seg-active {
+  animation: metroSegGlow 2s ease-in-out infinite;
+}
+
+/* ===== TatwaMetro — point glow ===== */
+@keyframes metroPointGlow {
+  0%, 100% { opacity: 0.6; r: 4; }
+  50% { opacity: 1; r: 6; }
+}
+.metro-point-active {
+  animation: metroPointGlow 2s ease-in-out infinite;
 }
