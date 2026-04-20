@@ -49,7 +49,7 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
     bestDays: 'Best Days',
     emotionalState: 'Emotional State',
     breathingNote: 'Breathing Note',
-    tatwaMetro: 'Tatwa Meter',
+    tattwaMetro: 'Tattwa Meter',
     fullView: 'Full view',
 
     live: 'Live',
@@ -116,7 +116,7 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
     bestDays: 'Mejores Días',
     emotionalState: 'Estado Emocional',
     breathingNote: 'Nota Respiratoria',
-    tatwaMetro: 'Tatwámetro',
+    tattwaMetro: 'Tattwámetro',
     fullView: 'Vista completa',
 
     live: 'En vivo',

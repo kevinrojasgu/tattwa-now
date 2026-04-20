@@ -6,7 +6,7 @@
  *
  * Routes:
  *   /             → Home page (TattwaCard + full dashboard)
- *   /tattwameter → Dedicated Tatwa Meter instrument page
+ *   /tattwameter → Dedicated Tattwa Meter instrument page
  */
 
 import React, { useState, useCallback, useMemo, useEffect, Suspense } from 'react';
@@ -17,7 +17,7 @@ import { useTattwa } from './controllers/useTattwa';
 import { useScrollToTop } from './controllers/useScrollToTop';
 import { LanguageContext } from './controllers/useLanguage';
 import { TRANSLATIONS, detectBrowserLang } from './services/i18n.service';
-import { TatwaMetroPage } from './pages/TatwaMetroPage';
+import { TattwaMetroPage } from './pages/TattwaMetroPage';
 import type { Lang } from './types';
 
 // Above-fold components (NOT lazy-loaded)
@@ -32,7 +32,7 @@ const Timeline = React.lazy(() => import('./components/organisms/Timeline').then
 const MoonPhasePanel = React.lazy(() => import('./components/organisms/MoonPhasePanel').then((m) => ({ default: m.MoonPhasePanel })));
 const TattwaReference = React.lazy(() => import('./components/organisms/TattwaReference').then((m) => ({ default: m.TattwaReference })));
 const MiniMap = React.lazy(() => import('./components/organisms/MiniMap').then((m) => ({ default: m.MiniMap })));
-const TatwaMetro = React.lazy(() => import('./components/organisms/TatwaMetro').then((m) => ({ default: m.TatwaMetro })));
+const TattwaMetro = React.lazy(() => import('./components/organisms/TattwaMetro').then((m) => ({ default: m.TattwaMetro })));
 
 /**
  * Root application component.
@@ -182,9 +182,9 @@ function App(): React.JSX.Element {
         <TattwaCard state={state.tattwa} isLive={isLive} viewedDate={state.viewedDate} />
       </div>
 
-      {/* TatwaMetro — between TattwaCard and MiniMap */}
+      {/* TattwaMetro — between TattwaCard and MiniMap */}
       <Suspense fallback={<Spinner />}>
-        <TatwaMetro
+        <TattwaMetro
           state={state.tattwa}
           sunrise={state.tattwa.sunrise}
           viewedDate={viewedDate}
@@ -231,7 +231,7 @@ function App(): React.JSX.Element {
     <LanguageContext.Provider value={langCtx}>
       <Routes>
         <Route path="/" element={homePage} />
-        <Route path="/tattwameter" element={<TatwaMetroPage />} />
+        <Route path="/tattwameter" element={<TattwaMetroPage />} />
       </Routes>
     </LanguageContext.Provider>
   );

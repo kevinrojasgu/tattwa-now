@@ -640,7 +640,7 @@ body {
   animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* ===== TatwaMetro — segment glow pulse ===== */
+/* ===== TattwaMetro — segment glow pulse ===== */
 @keyframes metroSegGlow {
   0%, 100% { filter: brightness(1); }
   50% { filter: brightness(1.3); }
@@ -649,7 +649,7 @@ body {
   animation: metroSegGlow 2s ease-in-out infinite;
 }
 
-/* ===== TatwaMetro — point glow ===== */
+/* ===== TattwaMetro — point glow ===== */
 @keyframes metroPointGlow {
   0%, 100% { opacity: 0.6; r: 4; }
   50% { opacity: 1; r: 6; }

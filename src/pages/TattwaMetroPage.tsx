@@ -1,8 +1,8 @@
 /**
- * @file TatwaMetroPage.tsx
- * @description Dedicated full-page view for the Tatwa Meter instrument.
- * Accessible at `/tattwametter`. Shows the shared app header, the
- * TimeNavigator date selector, and the TatwaMetro dial — all reacting
+ * @file TattwaMetroPage.tsx
+ * @description Dedicated full-page view for the Tattwa Meter instrument.
+ * Accessible at `/tattwameter`. Shows the shared app header, the
+ * TimeNavigator date selector, and the TattwaMetro dial — all reacting
  * to the same selected datetime. The dial fills the available width up
  * to 480px so it feels like a proper instrument panel on any screen size.
  */
@@ -19,18 +19,18 @@ import { AppLayout } from '../components/templates/AppLayout';
 import { TATTWAS } from '../data/tattwaData';
 
 /** Lazy-load the heavy dial — it's the only thing on this page but still split */
-const TatwaMetro = React.lazy(() =>
-  import('../components/organisms/TatwaMetro').then((m) => ({ default: m.TatwaMetro }))
+const TattwaMetro = React.lazy(() =>
+  import('../components/organisms/TattwaMetro').then((m) => ({ default: m.TattwaMetro }))
 );
 
 /**
- * Dedicated page for the TatwaMetro instrument.
- * URL: /tattwametter
+ * Dedicated page for the TattwaMetro instrument.
+ * URL: /tattwameter
  *
  * Shares the same language context and location hooks as the home page.
  * Manages its own `viewedDate` and `openPanel` state independently.
  */
-export function TatwaMetroPage(): React.JSX.Element {
+export function TattwaMetroPage(): React.JSX.Element {
   const { t, lang, toggleLang } = useLanguage();
   const { location, autoDetect, setManualLocation } = useLocation();
 
@@ -142,7 +142,7 @@ export function TatwaMetroPage(): React.JSX.Element {
       {/* The instrument — larger on this dedicated page */}
       <div className="animate-fade-in-up stagger-1">
         <Suspense fallback={<Spinner />}>
-          <TatwaMetro
+          <TattwaMetro
             state={state.tattwa}
             sunrise={state.tattwa.sunrise}
             viewedDate={viewedDate}

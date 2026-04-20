@@ -1,6 +1,6 @@
 /**
- * @file TatwaMetro.tsx
- * @description Interactive SVG instrument replicating the Tatwametro from
+ * @file TattwaMetro.tsx
+ * @description Interactive SVG instrument replicating the Tattwametro from
  * Dr. Krumm-Heller's book. Shows a rotating inner disk with Tattwa color
  * segments, a pentagram with elemental point correspondences, a human figure,
  * and a fixed clock needle showing current time.
@@ -13,8 +13,8 @@ import { TATTWAS, TATTWA_ORDER } from '../../data/tattwaData';
 import { useLanguage } from '../../controllers/useLanguage';
 import type { TattwaName } from '../../types';
 
-/** Props for TatwaMetro */
-interface TatwaMetroProps {
+/** Props for TattwaMetro */
+interface TattwaMetroProps {
   /** Current tattwa state from useTattwa controller */
   state: TattwaState;
   /** Today's or viewed date's sunrise time */
@@ -118,14 +118,14 @@ function needleRotationDeg(now: Date): number {
 }
 
 /**
- * The Tatwa Meter — an SVG dial instrument showing the rotating
+ * The Tattwa Meter — an SVG dial instrument showing the rotating
  * five-tattwa color wheel, pentagram, human figure, and clock needle.
  *
  * @param state - Current TattwaState
  * @param sunrise - Sunrise Date for disk alignment
  * @param viewedDate - Viewed date/time (null = live)
  */
-export function TatwaMetro({ state, sunrise, viewedDate, maxSize = 300 }: TatwaMetroProps): React.JSX.Element {
+export function TattwaMetro({ state, sunrise, viewedDate, maxSize = 300 }: TattwaMetroProps): React.JSX.Element {
   const { t } = useLanguage();
   const { pathname } = useLocation();
   const isFullPage = pathname === '/tattwameter';
@@ -207,7 +207,7 @@ export function TatwaMetro({ state, sunrise, viewedDate, maxSize = 300 }: TatwaM
   return (
     <div className="rounded-2xl bg-white/5 backdrop-blur-sm p-4 sm:p-6 glass-card">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm uppercase tracking-wider text-white/50">{t.tatwaMetro}</h3>
+        <h3 className="text-sm uppercase tracking-wider text-white/50">{t.tattwaMetro}</h3>
         {!isFullPage && (
           <Link
             to="/tattwameter"

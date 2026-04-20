@@ -87,9 +87,9 @@ export interface Translations {
   emotionalState: string;
   /** Property label for breathing note */
   breathingNote: string;
-  /** Section heading for TatwaMetro */
-  tatwaMetro: string;
-  /** Link to open the dedicated TatwaMetro page */
+  /** Section heading for TattwaMetro */
+  tattwaMetro: string;
+  /** Link to open the dedicated TattwaMetro page */
   fullView: string;
 
   // TimeNavigator
