@@ -11,7 +11,6 @@ import React, { useState, useCallback, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation } from '../controllers/useLocation';
 import { useTattwa } from '../controllers/useTattwa';
-import { useScrollToTop } from '../controllers/useScrollToTop';
 import { useLanguage } from '../controllers/useLanguage';
 import { LocationPicker } from '../components/organisms/LocationPicker';
 import { TimeNavigator } from '../components/organisms/TimeNavigator';
@@ -54,9 +53,6 @@ export function TatwaMetroPage(): React.JSX.Element {
   const handleDateChange = useCallback((d: Date): void => setViewedDate(d), []);
 
   const state = useTattwa(location.lat, location.lng, viewedDate);
-
-  // Scroll to top whenever the user jumps to a different date
-  useScrollToTop(viewedDate);
 
   if (!state) {
     return (
