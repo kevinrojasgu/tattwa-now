@@ -147,6 +147,7 @@ export function TattwaMetroPage(): React.JSX.Element {
             sunrise={state.tattwa.sunrise}
             viewedDate={viewedDate}
             maxSize={480}
+            onTimeChange={handleDateChange}
           />
         </Suspense>
       </div>
